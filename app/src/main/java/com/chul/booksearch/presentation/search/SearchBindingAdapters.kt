@@ -1,13 +1,13 @@
-package com.chul.booksearch.presentation
+package com.chul.booksearch.presentation.search
 
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.chul.booksearch.data.model.Books
-import com.chul.booksearch.presentation.search.SearchResultAdapter
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.chul.booksearch.presentation.search.SearchViewModel
 import com.chul.booksearch.presentation.util.AutoLoadScrollListener
+import com.chul.booksearch.presentation.util.GlideApp
 
 @BindingAdapter("setItems")
 fun RecyclerView.setAdapterItems(items: MutableList<Books>?) {
@@ -22,10 +22,17 @@ fun RecyclerView.setAutoScrollListener(viewModel: ViewModel) {
         val listener = object : AutoLoadScrollListener(layoutManager as LinearLayoutManager) {
             override fun loadMore(itemCount: Int) {
                 if(itemCount < viewModel.totalCount) {
-                    viewModel.searchMore()
+                    viewModel.onSearchMore()
                 }
             }
         }
         addOnScrollListener(listener)
+    }
+}
+
+@BindingAdapter("image")
+fun ImageView.loadImage(url: String?) {
+    if(!url.isNullOrEmpty()) {
+        GlideApp.with(this).load(url).fitCenter().into(this)
     }
 }

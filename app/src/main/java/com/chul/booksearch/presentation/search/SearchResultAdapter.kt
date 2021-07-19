@@ -7,18 +7,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.chul.booksearch.R
 import com.chul.booksearch.data.model.Books
+import com.chul.booksearch.databinding.ViewSearchResultBinding
 
-class SearchResultAdapter: ListAdapter<Books, SearchResultViewHolder>(diffUtil) {
-
-    val itemClick: (String) -> Unit= {}
+class SearchResultAdapter(private val viewModel: SearchViewModel): ListAdapter<Books, SearchResultViewHolder>(diffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResultViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.view_search_result, parent, false)
-        return object: SearchResultViewHolder(view) {
-            override fun onClicked(isbn13: String) {
-                itemClick(isbn13)
-            }
-        }
+        val inflater = LayoutInflater.from(parent.context)
+        return SearchResultViewHolder(ViewSearchResultBinding.inflate(inflater, parent, false), viewModel)
     }
 
     override fun onBindViewHolder(holder: SearchResultViewHolder, position: Int) {

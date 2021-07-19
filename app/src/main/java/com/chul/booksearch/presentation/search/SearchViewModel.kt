@@ -12,25 +12,34 @@ import javax.inject.Inject
 
 class SearchViewModel @Inject constructor(private val getSearchResultUseCase: GetSearchResultUseCase): ViewModel() {
 
-    private val _result: MutableLiveData<MutableList<Books>> = MutableLiveData()
+    private val _result = MutableLiveData<MutableList<Books>>()
     val result: LiveData<MutableList<Books>> = _result
 
     private var currentQuery = ""
     val query = MutableLiveData<String>()
 
+    private var _booksItemClickEvent = MutableLiveData<String>()
+    val booksItemClickEvent: LiveData<String> = _booksItemClickEvent
+
     var totalCount = 0
     var page = 1
 
-    fun search() {
+    fun onSearch() {
         currentQuery = query.value.toString()
         if(currentQuery.isEmpty()) return
         init()
         requestSearch()
     }
 
-    fun searchMore() {
+    fun onSearchMore() {
         page++
         requestPageSearch()
+    }
+
+    fun onBooksItemClick(isbn13: String) {
+        if(isbn13.isNotEmpty()) {
+            _booksItemClickEvent.value = isbn13
+        }
     }
 
     private fun init() {

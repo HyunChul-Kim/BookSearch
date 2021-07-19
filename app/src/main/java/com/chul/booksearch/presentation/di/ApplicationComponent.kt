@@ -1,6 +1,7 @@
 package com.chul.booksearch.presentation.di
 
 import android.content.Context
+import com.chul.booksearch.presentation.bookdetail.di.DetailComponent
 import com.chul.booksearch.presentation.di.module.*
 import com.chul.booksearch.presentation.search.di.SearchComponent
 import dagger.BindsInstance
@@ -24,7 +25,8 @@ interface ApplicationComponent {
     }
 
     fun searchComponent(): SearchComponent.Factory
+    fun detailComponent(): DetailComponent.Factory
 }
 
-@Module(subcomponents = [SearchComponent::class])
+@Module(subcomponents = [SearchComponent::class, DetailComponent::class])
 object SubComponentModule
