@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.chul.booksearch.R
 import com.chul.booksearch.data.model.Books
+import com.chul.booksearch.presentation.util.GlideApp
 
 abstract class SearchResultViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
 
@@ -26,7 +27,7 @@ abstract class SearchResultViewHolder(itemView: View): RecyclerView.ViewHolder(i
     }
 
     fun bind(book: Books) {
-        Glide.with(itemView.context).load(book.image).fitCenter().into(imageView)
+        GlideApp.with(itemView.context).load(book.image).fitCenter().into(imageView)
         title.text = book.title
         subtitle.text = book.subtitle
         price.text = book.price

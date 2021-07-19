@@ -6,6 +6,7 @@ import com.chul.booksearch.data.model.SearchResponse
 import com.chul.booksearch.data.model.Result
 import com.chul.booksearch.data.model.Result.Success
 import com.chul.booksearch.domain.usecase.GetSearchResultUseCase
+import com.chul.booksearch.presentation.util.LogHelper
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -54,7 +55,6 @@ class SearchViewModel @Inject constructor(private val getSearchResultUseCase: Ge
             if(response is Success) {
                 response.data.books?.let {
                     val list = _result.value?.toMutableList()
-                    //_result.value?.let { resultList -> list.addAll(resultList) }
                     list?.addAll(it as ArrayList)
                     _result.value = list
                 }
