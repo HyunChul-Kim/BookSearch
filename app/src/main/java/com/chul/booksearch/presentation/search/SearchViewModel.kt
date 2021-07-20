@@ -46,6 +46,21 @@ class SearchViewModel @Inject constructor(private val getSearchResultUseCase: Ge
         page = 1
     }
 
+    private fun getKeywords(query: String): List<String> {
+        val keywords = when {
+            query.contains("|") -> {
+                query.split("|")
+            }
+            query.contains("-") -> {
+                query.split("-")
+            }
+            else -> {
+                listOf(query)
+            }
+        }
+        return keywords
+    }
+
     private fun requestSearch() {
         viewModelScope.launch {
             val response: Result<SearchResponse> = getSearchResultUseCase.invoke(currentQuery, page)
