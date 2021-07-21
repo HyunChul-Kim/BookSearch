@@ -10,9 +10,13 @@ data class SearchResponse(
     @SerializedName("page")
     private val _page: String?,
     @SerializedName("books")
-    val books: List<Books>?
+    var books: List<Books>?
 ) {
     val error: String get() = _error ?: ""
     val total: Int get() = _total?.toInt() ?: 0
     val page: Int get() = _page?.toInt() ?: 0
+    /*var books: List<Books> get() = _books ?: ArrayList()
+        set(value) {
+
+        }*/
 }

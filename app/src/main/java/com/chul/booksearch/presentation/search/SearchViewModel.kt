@@ -6,7 +6,6 @@ import com.chul.booksearch.data.model.SearchResponse
 import com.chul.booksearch.data.model.Result
 import com.chul.booksearch.data.model.Result.Success
 import com.chul.booksearch.domain.usecase.GetSearchResultUseCase
-import com.chul.booksearch.presentation.util.LogHelper
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,19 +14,23 @@ class SearchViewModel @Inject constructor(private val getSearchResultUseCase: Ge
     private val _result = MutableLiveData<MutableList<Books>>()
     val result: LiveData<MutableList<Books>> = _result
 
-    private var currentQuery = ""
+    private var queries = listOf<String>()
+    private var originalQuery = ""
     val query = MutableLiveData<String>()
 
     private var _booksItemClickEvent = MutableLiveData<String>()
     val booksItemClickEvent: LiveData<String> = _booksItemClickEvent
 
-    var totalCount = 0
     var page = 1
+    var totalCount = 0
+    var opType = OP_TYPE_NONE
 
     fun onSearch() {
-        currentQuery = query.value.toString()
-        if(currentQuery.isEmpty()) return
+        originalQuery = query.value.toString()
+        if(originalQuery.isEmpty()) return
         init()
+        updateOperator(originalQuery)
+        updateQuery()
         requestSearch()
     }
 
@@ -44,26 +47,40 @@ class SearchViewModel @Inject constructor(private val getSearchResultUseCase: Ge
 
     private fun init() {
         page = 1
+        totalCount = 0
+        opType = OP_TYPE_NONE
     }
 
-    private fun getKeywords(query: String): List<String> {
-        val keywords = when {
-            query.contains("|") -> {
-                query.split("|")
-            }
-            query.contains("-") -> {
-                query.split("-")
-            }
-            else -> {
-                listOf(query)
-            }
+    private fun updateOperator(query: String) {
+        opType = when {
+            query.contains("|") -> OP_TYPE_OR
+            query.contains("-") -> OP_TYPE_NOT
+            else -> OP_TYPE_NONE
         }
-        return keywords
+    }
+
+    private fun updateQuery() {
+        val queryList = when(opType) {
+            OP_TYPE_OR -> originalQuery.split("|")
+            OP_TYPE_NOT -> originalQuery.split("-")
+            else -> listOf(originalQuery)
+        }
+        queries = if(queryList.size > LIMIT_QUERY_SIZE) queryList.subList(0, LIMIT_QUERY_SIZE) else queryList
     }
 
     private fun requestSearch() {
         viewModelScope.launch {
-            val response: Result<SearchResponse> = getSearchResultUseCase.invoke(currentQuery, page)
+            val response: Result<SearchResponse> = when(opType) {
+                OP_TYPE_OR -> {
+                    getSearchResultUseCase.invokeWithOr(queries[0], queries[1], page)
+                }
+                OP_TYPE_NOT -> {
+                    getSearchResultUseCase.invokeWithNot(queries[0], queries[1], page)
+                }
+                else -> {
+                    getSearchResultUseCase.invoke(originalQuery, page)
+                }
+            }
             if(response is Success) {
                 totalCount = response.data.total
                 response.data.books?.let {
@@ -75,7 +92,17 @@ class SearchViewModel @Inject constructor(private val getSearchResultUseCase: Ge
 
     private fun requestPageSearch() {
         viewModelScope.launch {
-            val response: Result<SearchResponse> = getSearchResultUseCase.invoke(currentQuery, page)
+            val response:  Result<SearchResponse> = when(opType) {
+                OP_TYPE_OR -> {
+                    getSearchResultUseCase.invokeWithOr(queries[0], queries[1], page)
+                }
+                OP_TYPE_NOT -> {
+                    getSearchResultUseCase.invokeWithNot(queries[0], queries[1], page)
+                }
+                else -> {
+                    getSearchResultUseCase.invoke(originalQuery, page)
+                }
+            }
             if(response is Success) {
                 response.data.books?.let {
                     val list = _result.value?.toMutableList()
@@ -84,5 +111,13 @@ class SearchViewModel @Inject constructor(private val getSearchResultUseCase: Ge
                 }
             }
         }
+    }
+
+    companion object {
+        const val OP_TYPE_NONE = 0
+        const val OP_TYPE_OR = 1
+        const val OP_TYPE_NOT = 2
+
+        const val LIMIT_QUERY_SIZE = 2
     }
 }
