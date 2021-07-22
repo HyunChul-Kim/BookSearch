@@ -6,10 +6,13 @@ import com.chul.booksearch.data.model.SearchResponse
 import com.chul.booksearch.data.model.Result
 import com.chul.booksearch.data.model.Result.Success
 import com.chul.booksearch.domain.usecase.GetSearchResultUseCase
+import com.chul.booksearch.presentation.util.NetworkManager
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class SearchViewModel @Inject constructor(private val getSearchResultUseCase: GetSearchResultUseCase): ViewModel() {
+class SearchViewModel @Inject constructor(
+    private val getSearchResultUseCase: GetSearchResultUseCase,
+    private val networkManager: NetworkManager): ViewModel() {
 
     private val _result = MutableLiveData<MutableList<Books>>()
     val result: LiveData<MutableList<Books>> = _result
@@ -20,6 +23,9 @@ class SearchViewModel @Inject constructor(private val getSearchResultUseCase: Ge
 
     private var _booksItemClickEvent = MutableLiveData<String>()
     val booksItemClickEvent: LiveData<String> = _booksItemClickEvent
+
+    private var _networkExceptionEvent = MutableLiveData<Unit>()
+    val networkExceptionEvent: LiveData<Unit> = _networkExceptionEvent
 
     var page = 1
     var totalCount = 0
@@ -69,6 +75,10 @@ class SearchViewModel @Inject constructor(private val getSearchResultUseCase: Ge
     }
 
     private fun requestSearch() {
+        if(!networkManager.isNetworkConnected()) {
+            _networkExceptionEvent.value = Unit
+            return
+        }
         viewModelScope.launch {
             val response: Result<SearchResponse> = when(opType) {
                 OP_TYPE_OR -> {
@@ -91,6 +101,10 @@ class SearchViewModel @Inject constructor(private val getSearchResultUseCase: Ge
     }
 
     private fun requestPageSearch() {
+        if(!networkManager.isNetworkConnected()) {
+            _networkExceptionEvent.value = Unit
+            return
+        }
         viewModelScope.launch {
             val response:  Result<SearchResponse> = when(opType) {
                 OP_TYPE_OR -> {

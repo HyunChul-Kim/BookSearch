@@ -6,12 +6,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.chul.booksearch.BookApplication
+import com.chul.booksearch.R
 import com.chul.booksearch.databinding.ActivitySearchBinding
 import com.chul.booksearch.presentation.bookdetail.DetailActivity
+import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
 class SearchActivity : AppCompatActivity() {
@@ -65,17 +66,24 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupEvent() {
-        searchViewModel.booksItemClickEvent.observe(this, Observer { isbn13 ->
+        searchViewModel.booksItemClickEvent.observe(this) { isbn13 ->
             val detailIntent = Intent(this, DetailActivity::class.java).apply {
                 putExtra("isbn13", isbn13)
             }
             startActivity(detailIntent)
-        })
+        }
+        searchViewModel.networkExceptionEvent.observe(this) {
+            showSnackBar(resources.getString(R.string.network_not_connected))
+        }
     }
 
     private fun hideKeyboard() {
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(binding.searchEditText.windowToken, 0)
+    }
+
+    private fun showSnackBar(msg: String) {
+        Snackbar.make(binding.root, msg, Snackbar.LENGTH_LONG).show()
     }
 
 }

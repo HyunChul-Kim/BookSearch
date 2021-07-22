@@ -38,7 +38,6 @@ class GetSearchResultUseCase(private val repository: BookRepository) {
                     result.data.books?.let {
                         books.addAll(it)
                     }
-                    //books.addAll(result.data._books)
                 }
             }
             Result.Success(SearchResponse("0", total.toString(), nextPage.toString(), books))

@@ -1,6 +1,8 @@
 package com.chul.booksearch.presentation.di.module
 
+import android.content.Context
 import com.chul.booksearch.data.api.BookService
+import com.chul.booksearch.presentation.util.NetworkManager
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -27,5 +29,11 @@ class NetworkModule {
     @Provides
     fun provideSearchService(retrofit: Retrofit): BookService {
         return retrofit.create(BookService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideNetworkManager(context: Context): NetworkManager {
+        return NetworkManager(context.applicationContext)
     }
 }
