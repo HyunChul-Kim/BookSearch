@@ -6,7 +6,7 @@ import com.chul.booksearch.data.model.Result
 
 interface BookRemoteDataSource {
 
-    suspend fun getSearchResult(query: String, page: Int): Result<SearchResponse>
+    suspend fun getSearchResult(query: String, page: Int): SearchResponse
 
-    suspend fun getBooksDetail(isbn13: String): Result<BooksDetail>
+    suspend fun getBooksDetail(isbn13: String): BooksDetail
 }
