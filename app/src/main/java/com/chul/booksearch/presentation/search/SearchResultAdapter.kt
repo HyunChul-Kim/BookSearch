@@ -4,12 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import com.chul.booksearch.R
 import com.chul.booksearch.data.model.Books
 import com.chul.booksearch.databinding.ViewSearchResultBinding
 
 class SearchResultAdapter(private val viewModel: SearchViewModel): ListAdapter<Books, SearchResultViewHolder>(diffUtil) {
+
+    var itemChangedCallback: ((Boolean) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResultViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -18,6 +18,16 @@ class SearchResultAdapter(private val viewModel: SearchViewModel): ListAdapter<B
 
     override fun onBindViewHolder(holder: SearchResultViewHolder, position: Int) {
         holder.bind(getItem(position))
+    }
+
+    override fun onCurrentListChanged(
+        previousList: MutableList<Books>,
+        currentList: MutableList<Books>
+    ) {
+        super.onCurrentListChanged(previousList, currentList)
+        itemChangedCallback?.let {
+            it(currentList.size <= previousList.size)
+        }
     }
 
     companion object {

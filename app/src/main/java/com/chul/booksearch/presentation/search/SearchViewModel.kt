@@ -16,8 +16,8 @@ class SearchViewModel @Inject constructor(
     private val getSearchResultUseCase: GetSearchResultUseCase,
     private val networkManager: NetworkManager): ViewModel() {
 
-    private val _result = MutableLiveData<MutableList<Books>>()
-    val result: LiveData<MutableList<Books>> = _result
+    private val _result = MutableLiveData<List<Books>>()
+    val result: LiveData<List<Books>> = _result
 
     private var currentQuery = ""
     val query = MutableLiveData<String>()
@@ -40,7 +40,7 @@ class SearchViewModel @Inject constructor(
 
         _loadingEvent.value = true
 
-        init()
+        initialize()
         requestSearch()
     }
 
@@ -55,10 +55,10 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun init() {
+    private fun initialize() {
         page = 1
         totalCount = 0
-        _result.value = null
+        _result.value = emptyList()
     }
 
     private fun requestSearch() {
@@ -74,13 +74,14 @@ class SearchViewModel @Inject constructor(
                     totalCount = response.data.total
                     response.data.books?.let {
                         _result.value = it as ArrayList
-                        _loadingEvent.value = false
                     }
                 }
                 is Error -> {
+                    _result.value = emptyList()
                     _networkExceptionEvent.value = Event(ErrorType.REQUEST_ERROR)
                 }
             }
+            _loadingEvent.value = false
         }
     }
 

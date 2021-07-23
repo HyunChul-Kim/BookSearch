@@ -42,7 +42,13 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupListAdapter() {
-        binding.searchRecyclerView.adapter = SearchResultAdapter(searchViewModel)
+        binding.searchRecyclerView.adapter = SearchResultAdapter(searchViewModel).apply {
+            itemChangedCallback = { changed ->
+                if(changed) {
+                    binding.searchRecyclerView.scrollToPosition(0)
+                }
+            }
+        }
         binding.searchRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
     }
 
