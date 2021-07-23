@@ -19,13 +19,13 @@ class SearchActivity : AppCompatActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    @Inject
-    lateinit var searchViewModel: SearchViewModel
+    private lateinit var searchViewModel: SearchViewModel
     private lateinit var binding: ActivitySearchBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        (applicationContext as BookApplication).appComponent.searchComponent().create().inject(this)
         super.onCreate(savedInstanceState)
+        (applicationContext as BookApplication).appComponent.searchComponent().create().inject(this)
+        setupViewModel()
         binding = ActivitySearchBinding.inflate(layoutInflater).apply {
             vm = searchViewModel
             lifecycleOwner = this@SearchActivity
@@ -37,13 +37,17 @@ class SearchActivity : AppCompatActivity() {
         setupEvent()
     }
 
+    private fun setupViewModel() {
+        searchViewModel = ViewModelProvider(this, viewModelFactory)[SearchViewModel::class.java]
+    }
+
     private fun setupListAdapter() {
         binding.searchRecyclerView.adapter = SearchResultAdapter(searchViewModel)
         binding.searchRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
     }
 
     private fun setupEditText() {
-        binding.searchEditText.setOnEditorActionListener { textView, id, keyEvent ->
+        binding.searchEditText.setOnEditorActionListener { textView, id, _ ->
             var result = false
             if(id == EditorInfo.IME_ACTION_SEARCH) {
                 if(textView.text.isNotEmpty()) {

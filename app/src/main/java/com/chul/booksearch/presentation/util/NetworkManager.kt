@@ -9,7 +9,7 @@ import androidx.annotation.RequiresApi
 class NetworkManager constructor(private val context: Context){
 
     fun isNetworkConnected(): Boolean {
-        return if(Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             isNetworkConnectedApi23()
         } else {
             isNetworkConnectedUnderApi22()
