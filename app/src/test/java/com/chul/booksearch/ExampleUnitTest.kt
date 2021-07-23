@@ -70,23 +70,6 @@ class ExampleUnitTest {
         testScope.cleanupTestCoroutines()
     }
 
-    fun getServerResponseError() {
-        testScope.runBlockingTest {
-            val errorMessage = "occurred error"
-            doThrow(RuntimeException(errorMessage))
-                .`when`(getSearchResultUseCase)
-                .invoke("", 1)
-            val viewModel = SearchViewModel(getSearchResultUseCase, networkManager).apply {
-                query.value = "kotlin"
-            }
-            verify(getSearchResultUseCase).invoke("", 1)
-            verify(observer).onChanged(
-                Result.Error(RuntimeException(errorMessage), "-1")
-            )
-            viewModel.onSearch()
-        }
-    }
-
     @Test
     fun `test for http exception`() = runBlocking {
         val response = respository.getSearchResult("", 1)

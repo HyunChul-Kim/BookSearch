@@ -27,6 +27,9 @@ class SearchViewModel @Inject constructor(
     private var _networkExceptionEvent = MutableLiveData<Unit>()
     val networkExceptionEvent: LiveData<Unit> = _networkExceptionEvent
 
+    private var _loadingEvent = MutableLiveData<Boolean>()
+    val loadingEvent: LiveData<Boolean> = _loadingEvent
+
     var page = 1
     var totalCount = 0
     var opType = OP_TYPE_NONE
@@ -34,6 +37,9 @@ class SearchViewModel @Inject constructor(
     fun onSearch() {
         originalQuery = query.value.toString()
         if(originalQuery.isEmpty()) return
+
+        _loadingEvent.value = true
+
         init()
         updateOperator(originalQuery)
         updateQuery()
@@ -77,6 +83,7 @@ class SearchViewModel @Inject constructor(
     private fun requestSearch() {
         if(!networkManager.isNetworkConnected()) {
             _networkExceptionEvent.value = Unit
+            _loadingEvent.value = false
             return
         }
         viewModelScope.launch {
@@ -97,6 +104,7 @@ class SearchViewModel @Inject constructor(
                     _result.value = it as ArrayList
                 }
             }
+            _loadingEvent.value = false
         }
     }
 

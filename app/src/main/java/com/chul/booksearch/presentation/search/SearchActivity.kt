@@ -60,6 +60,7 @@ class SearchActivity : AppCompatActivity() {
         binding.searchButton.setOnClickListener {
             if(binding.searchEditText.text.isNotEmpty()) {
                 hideKeyboard()
+                binding.searchRecyclerView.scrollToPosition(0)
                 searchViewModel.onSearch()
             }
         }

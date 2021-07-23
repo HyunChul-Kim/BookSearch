@@ -14,7 +14,7 @@ class GetSearchResultUseCase(private val repository: BookRepository) {
     suspend fun invokeWithNot(query1: String, query2: String, page: Int): Result<SearchResponse> {
         val result = repository.getSearchResult(query1, page)
         if(result is Result.Success) {
-            result.data.books = result.data.books?.filter { !it.title.contains(query2) }
+            result.data.books = result.data.books?.filter { !it.title.contains(query2, true) }
         }
         return result
     }
