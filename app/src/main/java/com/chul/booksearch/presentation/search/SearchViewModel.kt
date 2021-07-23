@@ -5,6 +5,7 @@ import com.chul.booksearch.data.model.Books
 import com.chul.booksearch.data.model.SearchResponse
 import com.chul.booksearch.data.model.Result
 import com.chul.booksearch.data.model.Result.Success
+import com.chul.booksearch.data.model.Result.Error
 import com.chul.booksearch.domain.usecase.GetSearchResultUseCase
 import com.chul.booksearch.presentation.util.NetworkManager
 import kotlinx.coroutines.launch
@@ -23,8 +24,8 @@ class SearchViewModel @Inject constructor(
     private var _booksItemClickEvent = MutableLiveData<String>()
     val booksItemClickEvent: LiveData<String> = _booksItemClickEvent
 
-    private var _networkExceptionEvent = MutableLiveData<Unit>()
-    val networkExceptionEvent: LiveData<Unit> = _networkExceptionEvent
+    private var _networkExceptionEvent = MutableLiveData<ErrorType>()
+    val networkExceptionEvent: LiveData<ErrorType> = _networkExceptionEvent
 
     private var _loadingEvent = MutableLiveData<Boolean>()
     val loadingEvent: LiveData<Boolean> = _loadingEvent
@@ -56,38 +57,49 @@ class SearchViewModel @Inject constructor(
     private fun init() {
         page = 1
         totalCount = 0
+        _result.value = null
     }
 
     private fun requestSearch() {
         if(!networkManager.isNetworkConnected()) {
-            _networkExceptionEvent.value = Unit
+            _networkExceptionEvent.value = ErrorType.NETWORK_ERROR
             _loadingEvent.value = false
             return
         }
         viewModelScope.launch {
             val response: Result<SearchResponse> = getSearchResultUseCase.invoke(currentQuery, page, true)
-            if(response is Success) {
-                totalCount = response.data.total
-                response.data.books?.let {
-                    _result.value = it as ArrayList
+            when (response) {
+                is Success -> {
+                    totalCount = response.data.total
+                    response.data.books?.let {
+                        _result.value = it as ArrayList
+                        _loadingEvent.value = false
+                    }
+                }
+                is Error -> {
+                    _networkExceptionEvent.value = ErrorType.REQUEST_ERROR
                 }
             }
-            _loadingEvent.value = false
         }
     }
 
     private fun requestPageSearch() {
         if(!networkManager.isNetworkConnected()) {
-            _networkExceptionEvent.value = Unit
+            _networkExceptionEvent.value = ErrorType.NETWORK_ERROR
             return
         }
         viewModelScope.launch {
             val response:  Result<SearchResponse> = getSearchResultUseCase.invoke(currentQuery, page, false)
-            if(response is Success) {
-                response.data.books?.let {
-                    val list = _result.value?.toMutableList()
-                    list?.addAll(it as ArrayList)
-                    _result.value = list
+            when(response) {
+                is Success -> {
+                    response.data.books?.let {
+                        val list = _result.value?.toMutableList()
+                        list?.addAll(it as ArrayList)
+                        _result.value = list
+                    }
+                }
+                is Error -> {
+                    _networkExceptionEvent.value = ErrorType.REQUEST_ERROR
                 }
             }
         }

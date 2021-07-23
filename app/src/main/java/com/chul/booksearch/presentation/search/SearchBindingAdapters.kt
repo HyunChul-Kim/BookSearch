@@ -11,9 +11,7 @@ import com.chul.booksearch.presentation.util.GlideApp
 
 @BindingAdapter("setItems")
 fun RecyclerView.setAdapterItems(items: MutableList<Books>?) {
-    items?.let {
-        (adapter as SearchResultAdapter).submitList(it)
-    }
+    (adapter as SearchResultAdapter).submitList(items)
 }
 
 @BindingAdapter("setAutoScroll")

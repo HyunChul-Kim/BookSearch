@@ -64,7 +64,6 @@ class SearchActivity : AppCompatActivity() {
         binding.searchButton.setOnClickListener {
             if(binding.searchEditText.text.isNotEmpty()) {
                 hideKeyboard()
-                binding.searchRecyclerView.scrollToPosition(0)
                 searchViewModel.onSearch()
             }
         }
@@ -77,8 +76,12 @@ class SearchActivity : AppCompatActivity() {
             }
             startActivity(detailIntent)
         }
-        searchViewModel.networkExceptionEvent.observe(this) {
-            showSnackBar(resources.getString(R.string.network_not_connected))
+        searchViewModel.networkExceptionEvent.observe(this) { errorType ->
+            when(errorType) {
+                ErrorType.NETWORK_ERROR -> showSnackBar(resources.getString(R.string.network_error_msg))
+                ErrorType.REQUEST_ERROR -> showSnackBar(resources.getString(R.string.request_error_msg))
+                else -> showSnackBar(resources.getString(R.string.default_error_msg))
+            }
         }
     }
 

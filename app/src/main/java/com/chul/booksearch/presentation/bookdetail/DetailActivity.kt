@@ -35,7 +35,7 @@ class DetailActivity: AppCompatActivity() {
 
     private fun setupEvent() {
         detailViewModel.networkExceptionEvent.observe(this) {
-            showSnackBar(resources.getString(R.string.network_not_connected))
+            showSnackBar(resources.getString(R.string.network_error_msg))
         }
     }
 
