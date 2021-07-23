@@ -7,6 +7,7 @@ import com.chul.booksearch.data.model.Result
 import com.chul.booksearch.data.model.Result.Success
 import com.chul.booksearch.data.model.Result.Error
 import com.chul.booksearch.domain.usecase.GetSearchResultUseCase
+import com.chul.booksearch.presentation.util.Event
 import com.chul.booksearch.presentation.util.NetworkManager
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,11 +22,11 @@ class SearchViewModel @Inject constructor(
     private var currentQuery = ""
     val query = MutableLiveData<String>()
 
-    private var _booksItemClickEvent = MutableLiveData<String>()
-    val booksItemClickEvent: LiveData<String> = _booksItemClickEvent
+    private var _booksItemClickEvent = MutableLiveData<Event<String>>()
+    val booksItemClickEvent: LiveData<Event<String>> = _booksItemClickEvent
 
-    private var _networkExceptionEvent = MutableLiveData<ErrorType>()
-    val networkExceptionEvent: LiveData<ErrorType> = _networkExceptionEvent
+    private var _networkExceptionEvent = MutableLiveData<Event<ErrorType>>()
+    val networkExceptionEvent: LiveData<Event<ErrorType>> = _networkExceptionEvent
 
     private var _loadingEvent = MutableLiveData<Boolean>()
     val loadingEvent: LiveData<Boolean> = _loadingEvent
@@ -50,7 +51,7 @@ class SearchViewModel @Inject constructor(
 
     fun onBooksItemClick(isbn13: String) {
         if(isbn13.isNotEmpty()) {
-            _booksItemClickEvent.value = isbn13
+            _booksItemClickEvent.value = Event(isbn13)
         }
     }
 
@@ -62,7 +63,7 @@ class SearchViewModel @Inject constructor(
 
     private fun requestSearch() {
         if(!networkManager.isNetworkConnected()) {
-            _networkExceptionEvent.value = ErrorType.NETWORK_ERROR
+            _networkExceptionEvent.value = Event(ErrorType.NETWORK_ERROR)
             _loadingEvent.value = false
             return
         }
@@ -77,7 +78,7 @@ class SearchViewModel @Inject constructor(
                     }
                 }
                 is Error -> {
-                    _networkExceptionEvent.value = ErrorType.REQUEST_ERROR
+                    _networkExceptionEvent.value = Event(ErrorType.REQUEST_ERROR)
                 }
             }
         }
@@ -85,7 +86,7 @@ class SearchViewModel @Inject constructor(
 
     private fun requestPageSearch() {
         if(!networkManager.isNetworkConnected()) {
-            _networkExceptionEvent.value = ErrorType.NETWORK_ERROR
+            _networkExceptionEvent.value = Event(ErrorType.NETWORK_ERROR)
             return
         }
         viewModelScope.launch {
@@ -99,7 +100,7 @@ class SearchViewModel @Inject constructor(
                     }
                 }
                 is Error -> {
-                    _networkExceptionEvent.value = ErrorType.REQUEST_ERROR
+                    _networkExceptionEvent.value = Event(ErrorType.REQUEST_ERROR)
                 }
             }
         }

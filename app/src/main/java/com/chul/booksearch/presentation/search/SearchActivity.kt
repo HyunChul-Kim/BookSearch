@@ -70,17 +70,20 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupEvent() {
-        searchViewModel.booksItemClickEvent.observe(this) { isbn13 ->
-            val detailIntent = Intent(this, DetailActivity::class.java).apply {
-                putExtra("isbn13", isbn13)
+        searchViewModel.booksItemClickEvent.observe(this) { event ->
+            event.getContentIfNotHandled()?.let { isbn13 ->
+                val detailIntent = Intent(this, DetailActivity::class.java).apply {
+                    putExtra("isbn13", isbn13)
+                }
+                startActivity(detailIntent)
             }
-            startActivity(detailIntent)
         }
-        searchViewModel.networkExceptionEvent.observe(this) { errorType ->
-            when(errorType) {
-                ErrorType.NETWORK_ERROR -> showSnackBar(resources.getString(R.string.network_error_msg))
-                ErrorType.REQUEST_ERROR -> showSnackBar(resources.getString(R.string.request_error_msg))
-                else -> showSnackBar(resources.getString(R.string.default_error_msg))
+        searchViewModel.networkExceptionEvent.observe(this) { event ->
+            event.getContentIfNotHandled()?.let { errorType ->
+                when(errorType) {
+                    ErrorType.NETWORK_ERROR -> showSnackBar(resources.getString(R.string.network_error_msg))
+                    ErrorType.REQUEST_ERROR -> showSnackBar(resources.getString(R.string.request_error_msg))
+                }
             }
         }
     }
