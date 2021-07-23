@@ -2,7 +2,6 @@ package com.chul.booksearch.data.datasource
 
 import com.chul.booksearch.data.model.BooksDetail
 import com.chul.booksearch.data.model.SearchResponse
-import com.chul.booksearch.data.model.Result
 
 interface BookRemoteDataSource {
 

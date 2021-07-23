@@ -21,7 +21,6 @@ class NetworkModule {
     fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://api.itbook.store/1.0/")
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .client(OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)

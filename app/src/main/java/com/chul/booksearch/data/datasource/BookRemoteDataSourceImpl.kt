@@ -3,11 +3,6 @@ package com.chul.booksearch.data.datasource
 import com.chul.booksearch.data.api.BookService
 import com.chul.booksearch.data.model.BooksDetail
 import com.chul.booksearch.data.model.SearchResponse
-import com.chul.booksearch.data.model.Result
-import com.chul.booksearch.data.model.Result.Success
-import com.chul.booksearch.data.model.Result.Error
-import com.chul.booksearch.presentation.util.LogHelper
-import java.lang.Exception
 
 class BookRemoteDataSourceImpl(private val api: BookService): BookRemoteDataSource {
     override suspend fun getSearchResult(query: String, page: Int): SearchResponse {

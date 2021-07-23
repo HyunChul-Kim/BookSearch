@@ -20,8 +20,7 @@ class GetSearchResultUseCase(private val repository: BookRepository) {
     }
 
     suspend fun invokeWithOr(query1: String, query2: String, page: Int): Result<SearchResponse> {
-        return coroutineScope {
-            var error = "0"
+        return supervisorScope {
             var total = 0
             var nextPage = 0
             val books = ArrayList<Books>()
